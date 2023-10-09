@@ -6,11 +6,13 @@
 from datetime import date, timedelta
 
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests.common import Form, tagged
+from odoo.tests import tagged
+from odoo.tests.common import Form
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
+@tagged("-at_install", "post_install")
 class TestPaymentOrderInboundBase(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls, chart_template_ref=None):
@@ -77,7 +79,7 @@ class TestPaymentOrderInboundBase(AccountTestInvoicingCommon):
         return invoice_form.save()
 
 
-@tagged("post_install", "-at_install")
+@tagged("-at_install", "post_install")
 class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
     def test_constrains_type(self):
         with self.assertRaises(ValidationError):
@@ -92,16 +94,18 @@ class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
 
     def test_invoice_communication_01(self):
         self.assertEqual(
-            self.invoice.name, self.invoice._get_payment_order_communication()
+            self.invoice.name, self.invoice._get_payment_order_communication_direct()
         )
         self.invoice.ref = "R1234"
         self.assertEqual(
-            self.invoice.name, self.invoice._get_payment_order_communication()
+            self.invoice.name, self.invoice._get_payment_order_communication_direct()
         )
 
     def test_invoice_communication_02(self):
         self.invoice.payment_reference = "R1234"
-        self.assertEqual("R1234", self.invoice._get_payment_order_communication())
+        self.assertEqual(
+            "R1234", self.invoice._get_payment_order_communication_direct()
+        )
 
     def test_creation(self):
         payment_order = self.inbound_order
@@ -124,10 +128,6 @@ class TestPaymentOrderInbound(TestPaymentOrderInboundBase):
         self.assertEqual(payment_order.state, "uploaded")
         with self.assertRaises(UserError):
             payment_order.unlink()
-        matching_number = (
-            payment_order.payment_ids.payment_line_ids.move_line_id.matching_number
-        )
-        self.assertTrue(matching_number and matching_number != "P")
 
         payment_order.action_uploaded_cancel()
         self.assertEqual(payment_order.state, "cancel")

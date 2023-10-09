@@ -280,17 +280,6 @@ msgid "Derivatives"
 msgstr "Derivaten"
 
 #. module: account_banking_pain_base
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_line__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_method__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_mode__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_order__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_bank__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_company__display_name
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_config_settings__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: account_banking_pain_base
 #: model:ir.model.fields.selection,name:account_banking_pain_base.selection__account_payment_line__category_purpose__divi
 #: model:ir.model.fields.selection,name:account_banking_pain_base.selection__account_payment_line__purpose__divd
 msgid "Dividend"
@@ -415,17 +404,6 @@ msgid "Housing Tax"
 msgstr ""
 
 #. module: account_banking_pain_base
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_line__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_method__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_mode__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_order__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_bank__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_company__id
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_config_settings__id
-msgid "ID"
-msgstr ""
-
-#. module: account_banking_pain_base
 #: model:ir.model.fields.selection,name:account_banking_pain_base.selection__account_payment_line__communication_type__iso
 msgid "ISO"
 msgstr "ISO"
@@ -543,17 +521,6 @@ msgstr ""
 #. module: account_banking_pain_base
 #: model:ir.model.fields.selection,name:account_banking_pain_base.selection__account_payment_line__purpose__lbri
 msgid "Labor Insurance"
-msgstr ""
-
-#. module: account_banking_pain_base
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_line____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_method____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_mode____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_account_payment_order____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_bank____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_company____last_update
-#: model:ir.model.fields,field_description:account_banking_pain_base.field_res_config_settings____last_update
-msgid "Last Modified on"
 msgstr ""
 
 #. module: account_banking_pain_base
@@ -689,7 +656,7 @@ msgstr ""
 #: code:addons/account_banking_pain_base/models/account_payment_order.py:0
 #, fuzzy, python-format
 msgid "Payment Line has reference '%s'."
-msgstr "Kan de '%s' niet berekenen van de betaalregel met referentie '%s'."
+msgstr "Betaalregel met referentie '%s'."
 
 #. module: account_banking_pain_base
 #: model:ir.model,name:account_banking_pain_base.model_account_payment_line
@@ -901,8 +868,10 @@ msgstr ""
 #. module: account_banking_pain_base
 #: code:addons/account_banking_pain_base/models/account_payment_order.py:0
 #, python-format
-msgid "The type of the field '%s' is %s. It should be a string or unicode."
-msgstr "Het type van veld '%s' is %s. Dit moet een string of unicode zijn."
+msgid ""
+"The type of the field '%(field)s' is %(value)s. It should be a string or "
+"unicode."
+msgstr ""
 
 #. module: account_banking_pain_base
 #: model:ir.model.fields,help:account_banking_pain_base.field_account_payment_line__priority
@@ -1048,6 +1017,10 @@ msgstr ""
 
 #~ msgid "Bank Payment Lines"
 #~ msgstr "Bank betaalregels"
+
+#, python-format
+#~ msgid "The type of the field '%s' is %s. It should be a string or unicode."
+#~ msgstr "Het type van veld '%s' is %s. Dit moet een string of unicode zijn."
 
 #~ msgid "pain.001.001.02"
 #~ msgstr "pain.001.001.02"

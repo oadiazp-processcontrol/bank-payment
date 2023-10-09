@@ -213,7 +213,10 @@ class AccountPaymentOrder(models.Model):
                 mandate_signature_date.text = self._prepare_field(
                     "Mandate Signature Date",
                     "signature_date",
-                    {"signature_date": fields.Date.to_string(mandate.signature_date)},
+                    {
+                        "line": line,
+                        "signature_date": fields.Date.to_string(mandate.signature_date),
+                    },
                     10,
                     gen_args=gen_args,
                 )
@@ -300,8 +303,7 @@ class AccountPaymentOrder(models.Model):
                         "Automatically switched from <b>First</b> to "
                         "<b>Recurring</b> when the debit order "
                         "<a href=# data-oe-model=account.payment.order "
-                        "data-oe-id=%d>%s</a> has been marked as uploaded."
-                    )
-                    % (order.id, order.name)
+                        "data-oe-id=%d>{}</a> has been marked as uploaded."
+                    ).format(order.id, order.name)
                 )
         return res

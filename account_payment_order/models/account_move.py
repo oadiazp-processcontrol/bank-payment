@@ -23,7 +23,6 @@ class AccountMove(models.Model):
     # payment mode or company level
     reference_type = fields.Selection(
         selection=[("none", "Free Reference"), ("structured", "Structured Reference")],
-        string="Reference Type",
         readonly=True,
         states={"draft": [("readonly", False)]},
         default="none",
@@ -39,10 +38,8 @@ class AccountMove(models.Model):
                 payment_mode = move.payment_mode_id
             move.payment_order_ok = payment_mode.payment_order_ok
 
-    def _get_payment_order_communication(self):
-        """
-        Retrieve the communication string for the payment order
-        """
+    def _get_payment_order_communication_direct(self):
+        """Retrieve the communication string for this direct item."""
         communication = self.payment_reference or self.ref or self.name or ""
         if self.is_invoice():
             if (self.reference_type or "none") != "none":
@@ -51,16 +48,43 @@ class AccountMove(models.Model):
                 communication = self.ref or self.payment_reference
             else:
                 communication = self.payment_reference or self.name
+        return communication
+
+    def _get_payment_order_communication_full(self):
+        """Retrieve the full communication string for the payment order.
+        Reversal moves and partial payments references added.
+        Avoid having everything in the same method to avoid infinite recursion
+        with partial payments.
+        """
+        communication = self._get_payment_order_communication_direct()
+        references = []
+        # Build a recordset to gather moves from which references have already
+        # taken in order to avoid duplicates
+        reference_moves = self.env["account.move"].browse()
         # If we have credit note(s) - reversal_move_id is a one2many
         if self.reversal_move_id:
-            references = []
             references.extend(
                 [
-                    move._get_payment_order_communication()
+                    move._get_payment_order_communication_direct()
                     for move in self.reversal_move_id
-                    if move.payment_reference or move.ref
                 ]
             )
+            reference_moves |= self.reversal_move_id
+        # Retrieve partial payments - e.g.: manual credit notes
+        (
+            invoice_partials,
+            exchange_diff_moves,
+        ) = self._get_reconciled_invoices_partials()
+        for (_x, _y, payment_move_line,) in (
+            invoice_partials + exchange_diff_moves
+        ):
+            payment_move = payment_move_line.move_id
+            if payment_move not in reference_moves:
+                references.append(
+                    payment_move._get_payment_order_communication_direct()
+                )
+        # Add references to communication from lines move
+        if references:
             communication += " " + " ".join(references)
         return communication
 
@@ -83,29 +107,43 @@ class AccountMove(models.Model):
         for move in self:
             if move.state != "posted":
                 raise UserError(_("The invoice %s is not in Posted state") % move.name)
-            applicable_lines = move.line_ids.filtered(
+            pre_applicable_lines = move.line_ids.filtered(
                 lambda x: (
                     not x.reconciled
-                    and x.payment_mode_id.payment_order_ok
-                    and x.account_id.internal_type in ("receivable", "payable")
-                    and not any(
-                        p_state in ("draft", "open", "generated")
-                        for p_state in x.payment_line_ids.mapped("state")
-                    )
+                    and x.account_id.account_type
+                    in ("asset_receivable", "liability_payable")
                 )
+            )
+            if not pre_applicable_lines:
+                raise UserError(_("No pending AR/AP lines to add on %s") % move.name)
+            payment_modes = pre_applicable_lines.mapped("payment_mode_id")
+            if not payment_modes:
+                raise UserError(_("No Payment Mode on invoice %s") % move.name)
+            applicable_lines = pre_applicable_lines.filtered(
+                lambda x: x.payment_mode_id.payment_order_ok
             )
             if not applicable_lines:
                 raise UserError(
                     _(
                         "No Payment Line created for invoice %s because "
-                        "it already exists or because this invoice is "
-                        "already paid."
+                        "its payment mode is not intended for payment orders."
                     )
                     % move.name
                 )
-            payment_modes = applicable_lines.mapped("payment_mode_id")
-            if not payment_modes:
-                raise UserError(_("No Payment Mode on invoice %s") % move.name)
+            payment_lines = applicable_lines.payment_line_ids.filtered(
+                lambda l: l.state in ("draft", "open", "generated")
+            )
+            if payment_lines:
+                raise UserError(
+                    _(
+                        "The invoice %(move)s is already added in the payment "
+                        "order(s) %(order)s."
+                    )
+                    % {
+                        "move": move.name,
+                        "order": payment_lines.order_id.mapped("name"),
+                    }
+                )
             for payment_mode in payment_modes:
                 payorder = apoo.search(
                     move.get_account_payment_domain(payment_mode), limit=1
@@ -127,21 +165,26 @@ class AccountMove(models.Model):
                 if new_payorder:
                     move.message_post(
                         body=_(
-                            "%d payment lines added to the new draft payment "
+                            "%(count)d payment lines added to the new draft payment "
                             "order <a href=# data-oe-model=account.payment.order "
-                            "data-oe-id=%d>%s</a> which has been automatically created."
+                            "data-oe-id=%(order_id)d>%(name)s</a>, which has been "
+                            "automatically created.",
+                            count=count,
+                            order_id=payorder.id,
+                            name=payorder.name,
                         )
-                        % (count, payorder.id, payorder.display_name)
                     )
                 else:
                     move.message_post(
                         body=_(
-                            "%d payment lines added to the existing draft "
+                            "%(count)d payment lines added to the existing draft "
                             "payment order "
                             "<a href=# data-oe-model=account.payment.order "
-                            "data-oe-id=%d>%s</a>."
+                            "data-oe-id=%(order_id)d>%(name)s</a>.",
+                            count=count,
+                            order_id=payorder.id,
+                            name=payorder.name,
                         )
-                        % (count, payorder.id, payorder.display_name)
                     )
         action = self.env["ir.actions.act_window"]._for_xml_id(
             "account_payment_order.account_payment_order_%s_action"

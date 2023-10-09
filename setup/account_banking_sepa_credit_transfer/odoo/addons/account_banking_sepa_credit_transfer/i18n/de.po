@@ -20,38 +20,17 @@ msgstr ""
 "X-Generator: Weblate 3.2.2\n"
 
 #. module: account_banking_sepa_credit_transfer
+#. odoo-python
 #: code:addons/account_banking_sepa_credit_transfer/models/account_payment_order.py:0
 #, python-format
 msgid ""
-"Bank account is missing on the bank payment line of partner '%s' (reference "
-"'%s')."
-msgstr ""
-"Das Bankkonto fehlt auf der Zahlungszeile des Partners '%s' (Referenz '%s')."
-
-#. module: account_banking_sepa_credit_transfer
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_line__display_name
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_method__display_name
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_order__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: account_banking_sepa_credit_transfer
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_line__id
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_method__id
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_order__id
-msgid "ID"
+"Bank account is missing on the bank payment line of partner "
+"'{partner}' (reference '{reference}')."
 msgstr ""
 
 #. module: account_banking_sepa_credit_transfer
 #: model:ir.model.fields.selection,name:account_banking_sepa_credit_transfer.selection__account_payment_line__local_instrument__inst
 msgid "Instant Transfer"
-msgstr ""
-
-#. module: account_banking_sepa_credit_transfer
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_line____last_update
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_method____last_update
-#: model:ir.model.fields,field_description:account_banking_sepa_credit_transfer.field_account_payment_order____last_update
-msgid "Last Modified on"
 msgstr ""
 
 #. module: account_banking_sepa_credit_transfer
@@ -65,6 +44,7 @@ msgid "PAIN Version"
 msgstr ""
 
 #. module: account_banking_sepa_credit_transfer
+#. odoo-python
 #: code:addons/account_banking_sepa_credit_transfer/models/account_payment_order.py:0
 #, python-format
 msgid "PAIN version '%s' is not supported."
@@ -115,3 +95,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:account_banking_sepa_credit_transfer.selection__account_payment_method__pain_version__pain_001_003_03
 msgid "pain.001.003.03"
 msgstr ""
+
+#, python-format
+#~ msgid ""
+#~ "Bank account is missing on the bank payment line of partner "
+#~ "'%s' (reference '%s')."
+#~ msgstr ""
+#~ "Das Bankkonto fehlt auf der Zahlungszeile des Partners '%s' (Referenz "
+#~ "'%s')."

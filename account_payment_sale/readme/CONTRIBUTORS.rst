@@ -4,3 +4,5 @@
 * Danimar Ribeiro
 * Raphaël Valyi
 * Raf Ven <raf.ven@dynapps.be>
+* Manuel Regidor <manuel.regidor@sygel.es>
+* Sodexis <dev@sodexis.com>

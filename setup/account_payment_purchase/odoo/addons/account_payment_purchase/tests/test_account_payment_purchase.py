@@ -3,24 +3,22 @@
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
 
 from odoo import fields
-from odoo.tests import Form, SavepointCase
+from odoo.tests import TransactionCase, tagged
 
 
-class TestAccountPaymentPurchase(SavepointCase):
+@tagged("-at_install", "post_install")
+class TestAccountPaymentPurchase(TransactionCase):
     @classmethod
     def setUpClass(cls):
-        super(TestAccountPaymentPurchase, cls).setUpClass()
+        super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, tracking_disable=True))
         cls.journal = cls.env["account.journal"].create(
             {"name": "Test journal", "code": "TEST", "type": "general"}
         )
-        cls.payment_method_out = cls.env["account.payment.method"].create(
-            {
-                "name": "Test payment method",
-                "code": "test",
-                "payment_type": "outbound",
-                "bank_account_required": True,
-            }
+        cls.payment_method_out = cls.env.ref(
+            "account.account_payment_method_manual_out"
         )
+        cls.payment_method_out.bank_account_required = True
         cls.payment_mode = cls.env["account.payment.mode"].create(
             {
                 "name": "Test payment mode",
@@ -52,7 +50,7 @@ class TestAccountPaymentPurchase(SavepointCase):
                 "name": "Test buy product",
                 "uom_id": cls.uom_id,
                 "uom_po_id": cls.uom_id,
-                "seller_ids": [(0, 0, {"name": cls.partner.id})],
+                "seller_ids": [(0, 0, {"partner_id": cls.partner.id})],
             }
         )
         cls.purchase = cls.env["purchase.order"].create(
@@ -87,8 +85,8 @@ class TestAccountPaymentPurchase(SavepointCase):
         invoice = self.env["account.move"].create(
             {"partner_id": self.partner.id, "move_type": "in_invoice"}
         )
-        with Form(invoice) as inv:
-            inv.purchase_id = self.purchase
+        invoice.purchase_id = self.purchase
+        invoice._onchange_purchase_auto_complete()
         self.assertEqual(
             self.purchase.invoice_ids[0].payment_mode_id, self.payment_mode
         )
@@ -115,15 +113,6 @@ class TestAccountPaymentPurchase(SavepointCase):
         self.assertEqual(
             result and result.get("warning", {}).get("title", False), "Warning"
         )
-
-    def test_from_purchase_order_empty_mode_invoicing(self):
-        self.purchase.payment_mode_id = False
-        self.purchase.button_confirm()
-        invoice_form = Form(
-            self.env["account.move"].with_context(default_type="in_invoice")
-        )
-        invoice_form.purchase_id = self.purchase
-        self.assertEqual(invoice_form.payment_mode_id, self.payment_mode)
 
     def test_from_purchase_order_invoicing_bank(self):
         # Test partner_bank

@@ -32,7 +32,6 @@ class AccountPaymentOrder(models.Model):
             ("CRED", "Borne by Creditor"),
             ("DEBT", "Borne by Debtor"),
         ],
-        string="Charge Bearer",
         default="SLEV",
         readonly=True,
         states={"draft": [("readonly", False)], "open": [("readonly", False)]},
@@ -48,7 +47,6 @@ class AccountPaymentOrder(models.Model):
         "debtor.",
     )
     batch_booking = fields.Boolean(
-        string="Batch Booking",
         readonly=True,
         states={"draft": [("readonly", False)], "open": [("readonly", False)]},
         tracking=True,
@@ -204,15 +202,16 @@ class AccountPaymentOrder(models.Model):
                 "\n".join(
                     [error_msg_prefix] + error_msg_details_list + [error_msg_data]
                 )
-            )
+            ) from None
 
         if not isinstance(value, str):
             raise UserError(
                 _(
-                    "The type of the field '%s' is %s. It should be a string "
-                    "or unicode."
+                    "The type of the field '%(field)s' is %(value)s. It should be a string "
+                    "or unicode.",
+                    field=field_name,
+                    value=type(value),
                 )
-                % (field_name, type(value))
             )
         if not value:
             raise UserError(
@@ -262,7 +261,7 @@ class AccountPaymentOrder(models.Model):
                     "of the problem : %s"
                 )
                 % str(e)
-            )
+            ) from None
         return True
 
     def finalize_sepa_file_creation(self, xml_root, gen_args):
@@ -526,28 +525,25 @@ class AccountPaymentOrder(models.Model):
                 or gen_args.get("pain_flavor").startswith("pain.008.001.")
             ) and (partner.zip or partner.city):
                 adrline2 = etree.SubElement(postal_address, "AdrLine")
-                val = []
                 if partner.zip:
-                    val.append(
-                        self._prepare_field(
-                            "zip",
-                            "partner.zip",
-                            {"partner": partner},
-                            70,
-                            gen_args=gen_args,
-                        )
+                    val = self._prepare_field(
+                        "zip",
+                        "partner.zip",
+                        {"partner": partner},
+                        70,
+                        gen_args=gen_args,
                     )
+                else:
+                    val = ""
                 if partner.city:
-                    val.append(
-                        self._prepare_field(
-                            "city",
-                            "partner.city",
-                            {"partner": partner},
-                            70,
-                            gen_args=gen_args,
-                        )
+                    val += " " + self._prepare_field(
+                        "city",
+                        "partner.city",
+                        {"partner": partner},
+                        70,
+                        gen_args=gen_args,
                     )
-                adrline2.text = " ".join(val)
+                adrline2.text = val
         return True
 
     @api.model

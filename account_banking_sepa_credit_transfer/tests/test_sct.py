@@ -9,10 +9,10 @@ import time
 from lxml import etree
 
 from odoo.exceptions import UserError
-from odoo.tests.common import SavepointCase
+from odoo.tests.common import TransactionCase
 
 
-class TestSCT(SavepointCase):
+class TestSCT(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -29,7 +29,9 @@ class TestSCT(SavepointCase):
         cls.partner_asus = cls.env.ref("base.res_partner_1")
         cls.partner_c2c = cls.env.ref("base.res_partner_12")
         cls.eur_currency = cls.env.ref("base.EUR")
+        cls.eur_currency.active = True
         cls.usd_currency = cls.env.ref("base.USD")
+        cls.usd_currency.active = True
         cls.main_company = cls.env["res.company"].create(
             {"name": "Test EUR company", "currency_id": cls.eur_currency.id}
         )
@@ -44,19 +46,18 @@ class TestSCT(SavepointCase):
         )
         cls.account_expense = cls.account_model.create(
             {
-                "user_type_id": cls.env.ref("account.data_account_type_expenses").id,
-                "name": "Test expense account",
-                "code": "TEA",
+                "account_type": "expense",
                 "company_id": cls.main_company.id,
+                "name": "Test expense",
+                "code": "TE.1",
             }
         )
         cls.account_payable = cls.account_model.create(
             {
-                "user_type_id": cls.env.ref("account.data_account_type_payable").id,
-                "name": "Test payable account",
-                "code": "TTA",
+                "account_type": "liability_payable",
                 "company_id": cls.main_company.id,
-                "reconcile": True,
+                "name": "Test payable",
+                "code": "TP.1",
             }
         )
         (cls.partner_asus + cls.partner_c2c + cls.partner_agrolait).with_company(
@@ -95,8 +96,21 @@ class TestSCT(SavepointCase):
                 "bank_account_id": cls.partner_bank.id,
                 "bank_id": cls.partner_bank.bank_id.id,
                 "company_id": cls.main_company.id,
+                "outbound_payment_method_line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "payment_method_id": cls.env.ref(
+                                "account_banking_sepa_credit_transfer.sepa_credit_transfer"
+                            ).id,
+                            "payment_account_id": cls.account_expense.id,
+                        },
+                    )
+                ],
             }
         )
+
         # update payment mode
         cls.payment_mode = cls.env.ref(
             "account_banking_sepa_credit_transfer.payment_mode_outbound_sepa_ct1"

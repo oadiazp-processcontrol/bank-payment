@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-  © 2016 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
+  Copyright 2016-2022 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
   License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 -->
 <odoo>
@@ -10,14 +10,14 @@
     <field name="model">sale.order</field>
     <field name="inherit_id" ref="account_payment_sale.view_order_form" />
     <field name="arch" type="xml">
-        <field name="fiscal_position_id" position="after">
-            <field name="commercial_partner_id" invisible="1" />
+        <xpath expr="//field[@name='fiscal_position_id']/parent::div" position="after">
             <field
                     name="mandate_id"
                     attrs="{'invisible': [('mandate_required', '=', False)]}"
                 />
             <field name="mandate_required" invisible="1" />
-        </field>
+            <field name="commercial_invoice_partner_id" invisible="1" />
+        </xpath>
     </field>
 </record>
 

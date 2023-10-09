@@ -40,7 +40,6 @@ class AccountBankingMandate(models.Model):
     )
     scheme = fields.Selection(
         [("CORE", "Basic (CORE)"), ("B2B", "Enterprise (B2B)")],
-        string="Scheme",
         default="CORE",
         tracking=80,
     )
@@ -110,7 +109,10 @@ class AccountBankingMandate(models.Model):
                     )
                     % NUMBER_OF_UNUSED_MONTHS_BEFORE_EXPIRY
                 )
-                logger.info("SDD Mandate set to expired: ID %s" % (mandate.id))
+            logger.info(
+                "%d SDD Mandate set to expired: IDs %s"
+                % (len(expired_mandates), expired_mandates.ids)
+            )
         else:
             logger.info("0 SDD Mandates had to be set to Expired")
 

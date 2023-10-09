@@ -83,16 +83,7 @@ msgstr "Contacte"
 #: model:ir.model.fields,field_description:account_payment_partner.field_res_partner__customer_payment_mode_id
 #: model:ir.model.fields,field_description:account_payment_partner.field_res_users__customer_payment_mode_id
 msgid "Customer Payment Mode"
-msgstr "Mode de pagament del client"
-
-#. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner__display_name
-msgid "Display Name"
-msgstr "Nom de visualització"
+msgstr "Modalitat de pagament del client"
 
 #. module: account_payment_partner
 #: model:ir.model.fields.selection,name:account_payment_partner.selection__account_payment_mode__show_bank_account__first
@@ -112,18 +103,9 @@ msgid "Has Reconciled Items"
 msgstr ""
 
 #. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner__id
-msgid "ID"
-msgstr "ID"
-
-#. module: account_payment_partner
 #: model:ir.model,name:account_payment_partner.model_account_invoice_report
 msgid "Invoices Statistics"
-msgstr "Estadístiques de factures"
+msgstr "Estadístiques de Factures"
 
 #. module: account_payment_partner
 #: model:ir.model,name:account_payment_partner.model_account_move
@@ -136,15 +118,6 @@ msgid "Journal Item"
 msgstr "Apunt comptable"
 
 #. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner____last_update
-msgid "Last Modified on"
-msgstr "Última modificació el"
-
-#. module: account_payment_partner
 #: model:ir.model.fields.selection,name:account_payment_partner.selection__account_payment_mode__show_bank_account__last
 msgid "Last n chars"
 msgstr "Últims n caràcters"
@@ -155,6 +128,7 @@ msgid "No"
 msgstr "No"
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/tests/test_account_payment_partner.py:0
 #, python-format
 msgid "No Chart of Account Template has been defined !"
@@ -165,7 +139,7 @@ msgstr "No s'ha definit cap plantilla de pla comptable !"
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_move__partner_bank_filter_type_domain
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_payment__partner_bank_filter_type_domain
 msgid "Partner Bank Filter Type Domain"
-msgstr "Domini del tipus de filtre del banc soci"
+msgstr "Dominio de tipo de filtro de banco asociado"
 
 #. module: account_payment_partner
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_bank_statement_line__payment_mode_id
@@ -175,19 +149,19 @@ msgstr "Domini del tipus de filtre del banc soci"
 #: model_terms:ir.ui.view,arch_db:account_payment_partner.view_account_invoice_filter
 #: model_terms:ir.ui.view,arch_db:account_payment_partner.view_account_invoice_report_search
 msgid "Payment Mode"
-msgstr "Mode de pagament"
+msgstr "Modalitat de pagament"
 
 #. module: account_payment_partner
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_bank_statement_line__payment_mode_filter_type_domain
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_move__payment_mode_filter_type_domain
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_payment__payment_mode_filter_type_domain
 msgid "Payment Mode Filter Type Domain"
-msgstr "Mode de pagament Tipus de filtre Domini"
+msgstr "Domini de tipus de filtre de modalitat de pagament"
 
 #. module: account_payment_partner
 #: model:ir.model,name:account_payment_partner.model_account_payment_mode
 msgid "Payment Modes"
-msgstr "Modes de pagament"
+msgstr "Modalitats de pagament"
 
 #. module: account_payment_partner
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report__payment_mode_id
@@ -224,8 +198,8 @@ msgstr "Seleccioneu el mode de pagament per defecte per a aquest proveïdor."
 
 #. module: account_payment_partner
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__show_bank_account
-msgid "Show bank account"
-msgstr "Mostra compte bancari"
+msgid "Show Bank Account"
+msgstr ""
 
 #. module: account_payment_partner
 #: model_terms:ir.ui.view,arch_db:account_payment_partner.account_payment_mode_form
@@ -260,6 +234,7 @@ msgstr ""
 "procedents de la modalitat de pagament actual."
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
@@ -270,6 +245,7 @@ msgstr ""
 "aquest mode de pagament, ja assignat a una altra companyia."
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
@@ -278,6 +254,18 @@ msgid ""
 msgstr ""
 "No podeu canviar la companyia. Com a mínim existeix un assentament amb "
 "aquest mode de pagament, ja assignat a una altra companyia."
+
+#~ msgid "Display Name"
+#~ msgstr "Nom mostrat"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última modificació el"
+
+#~ msgid "Show bank account"
+#~ msgstr "Mostra compte bancari"
 
 #~ msgid "Bank Account"
 #~ msgstr "Compte bancari"

@@ -83,15 +83,6 @@ msgid "Customer Payment Mode"
 msgstr "Modo de Pagamento do Cliente"
 
 #. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__display_name
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner__display_name
-msgid "Display Name"
-msgstr "Nome a Exibir"
-
-#. module: account_payment_partner
 #: model:ir.model.fields.selection,name:account_payment_partner.selection__account_payment_mode__show_bank_account__first
 msgid "First n chars"
 msgstr "Primeiros n caracteres"
@@ -109,15 +100,6 @@ msgid "Has Reconciled Items"
 msgstr ""
 
 #. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__id
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner__id
-msgid "ID"
-msgstr "ID"
-
-#. module: account_payment_partner
 #: model:ir.model,name:account_payment_partner.model_account_invoice_report
 msgid "Invoices Statistics"
 msgstr "Estatísticas de Faturas"
@@ -133,15 +115,6 @@ msgid "Journal Item"
 msgstr "Item do Diário"
 
 #. module: account_payment_partner
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_invoice_report____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_move_line____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode____last_update
-#: model:ir.model.fields,field_description:account_payment_partner.field_res_partner____last_update
-msgid "Last Modified on"
-msgstr "Última Modificação em"
-
-#. module: account_payment_partner
 #: model:ir.model.fields.selection,name:account_payment_partner.selection__account_payment_mode__show_bank_account__last
 msgid "Last n chars"
 msgstr "Últimos n caracteres"
@@ -152,6 +125,7 @@ msgid "No"
 msgstr "Não"
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/tests/test_account_payment_partner.py:0
 #, python-format
 msgid "No Chart of Account Template has been defined !"
@@ -221,8 +195,8 @@ msgstr "Selecione o Modo de Pagamento do Fornecedor pré definido."
 
 #. module: account_payment_partner
 #: model:ir.model.fields,field_description:account_payment_partner.field_account_payment_mode__show_bank_account
-msgid "Show bank account"
-msgstr "Mostrar conta bancária"
+msgid "Show Bank Account"
+msgstr ""
 
 #. module: account_payment_partner
 #: model_terms:ir.ui.view,arch_db:account_payment_partner.account_payment_mode_form
@@ -257,6 +231,7 @@ msgstr ""
 "de pagamento atual."
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
@@ -267,6 +242,7 @@ msgstr ""
 "com este Modo de Pagamento, já atribuído a outra Empresa."
 
 #. module: account_payment_partner
+#. odoo-python
 #: code:addons/account_payment_partner/models/account_payment_mode.py:0
 #, python-format
 msgid ""
@@ -275,3 +251,15 @@ msgid ""
 msgstr ""
 "Não pode alterar a Empresa. Existe pelo menos um item de diáro com este Modo "
 "de Pagamento já relacionado com outra Empresa."
+
+#~ msgid "Display Name"
+#~ msgstr "Nome a Exibir"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "Last Modified on"
+#~ msgstr "Última Modificação em"
+
+#~ msgid "Show bank account"
+#~ msgstr "Mostrar conta bancária"

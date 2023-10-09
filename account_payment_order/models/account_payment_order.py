@@ -8,7 +8,6 @@ import base64
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare
 
 
 class AccountPaymentOrder(models.Model):
@@ -30,7 +29,6 @@ class AccountPaymentOrder(models.Model):
     )
     payment_type = fields.Selection(
         selection=[("inbound", "Inbound"), ("outbound", "Outbound")],
-        string="Payment Type",
         readonly=True,
         required=True,
     )
@@ -176,10 +174,11 @@ class AccountPaymentOrder(models.Model):
             ):
                 raise ValidationError(
                     _(
-                        "The payment type (%s) is not the same as the payment "
-                        "type of the payment mode (%s)"
+                        "The payment type (%(ptype)s) is not the same as the payment "
+                        "type of the payment mode (%(pmode)s)",
+                        ptype=order.payment_type,
+                        pmode=order.payment_mode_id.payment_type,
                     )
-                    % (order.payment_type, order.payment_mode_id.payment_type)
                 )
 
     @api.constrains("date_scheduled")
@@ -190,10 +189,11 @@ class AccountPaymentOrder(models.Model):
                 if order.date_scheduled < today:
                     raise ValidationError(
                         _(
-                            "On payment order %s, the Payment Execution Date "
-                            "is in the past (%s)."
+                            "On payment order %(porder)s, the Payment Execution Date "
+                            "is in the past (%(exedate)s).",
+                            porder=order.name,
+                            exedate=order.date_scheduled,
                         )
-                        % (order.name, order.date_scheduled)
                     )
 
     @api.depends("payment_line_ids", "payment_line_ids.amount_company_currency")
@@ -221,22 +221,24 @@ class AccountPaymentOrder(models.Model):
         for order in self:
             order.move_count = mapped_data.get(order.id, 0)
 
-    @api.model
-    def create(self, vals):
-        if vals.get("name", "New") == "New":
-            vals["name"] = (
-                self.env["ir.sequence"].next_by_code("account.payment.order") or "New"
-            )
-        if vals.get("payment_mode_id"):
-            payment_mode = self.env["account.payment.mode"].browse(
-                vals["payment_mode_id"]
-            )
-            vals["payment_type"] = payment_mode.payment_type
-            if payment_mode.bank_account_link == "fixed":
-                vals["journal_id"] = payment_mode.fixed_journal_id.id
-            if not vals.get("date_prefered") and payment_mode.default_date_prefered:
-                vals["date_prefered"] = payment_mode.default_date_prefered
-        return super(AccountPaymentOrder, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("name", "New") == "New":
+                vals["name"] = (
+                    self.env["ir.sequence"].next_by_code("account.payment.order")
+                    or "New"
+                )
+            if vals.get("payment_mode_id"):
+                payment_mode = self.env["account.payment.mode"].browse(
+                    vals["payment_mode_id"]
+                )
+                vals["payment_type"] = payment_mode.payment_type
+                if payment_mode.bank_account_link == "fixed":
+                    vals["journal_id"] = payment_mode.fixed_journal_id.id
+                if not vals.get("date_prefered") and payment_mode.default_date_prefered:
+                    vals["date_prefered"] = payment_mode.default_date_prefered
+        return super(AccountPaymentOrder, self).create(vals_list)
 
     @api.onchange("payment_mode_id")
     def payment_mode_id_change(self):
@@ -315,16 +317,14 @@ class AccountPaymentOrder(models.Model):
                 ):
                     payline_err_text.append(
                         _(
-                            "The payment mode '%s' has the option "
+                            "The payment mode '%(pmode)s' has the option "
                             "'Disallow Debit Before Maturity Date'. The "
-                            "payment line %s has a maturity date %s "
-                            "which is after the computed payment date %s."
-                        )
-                        % (
-                            order.payment_mode_id.name,
-                            payline.name,
-                            payline.ml_maturity_date,
-                            requested_date,
+                            "payment line %(pline)s has a maturity date %(mdate)s "
+                            "which is after the computed payment date %(pdate)s.",
+                            pmode=order.payment_mode_id.name,
+                            pline=payline.name,
+                            mdate=payline.ml_maturity_date,
+                            pdate=requested_date,
                         )
                     )
                 # Write requested_date on 'date' field of payment line
@@ -355,15 +355,20 @@ class AccountPaymentOrder(models.Model):
                     + "\n".join(payline_err_text)
                 )
 
-            order.recompute()
+            order.env.flush_all()
+
             # Create account payments
             payment_vals = []
             for paydict in list(group_paylines.values()):
                 # Block if a bank payment line is <= 0
                 if paydict["total"] <= 0:
                     raise UserError(
-                        _("The amount for Partner '%s' is negative " "or null (%.2f) !")
-                        % (paydict["paylines"][0].partner_id.name, paydict["total"])
+                        _(
+                            "The amount for Partner '%(partner)s' is negative "
+                            "or null (%(amount).2f) !",
+                            partner=paydict["paylines"][0].partner_id.name,
+                            amount=paydict["total"],
+                        )
                     )
                 payment_vals.append(paydict["paylines"]._prepare_account_payment_vals())
             self.env["account.payment"].create(payment_vals)
@@ -418,50 +423,15 @@ class AccountPaymentOrder(models.Model):
         return action
 
     def generated2uploaded(self):
-        """Post payments and reconcile against source journal items
-
-        Partially reconcile payments that don't match their source journal items,
-        then reconcile the rest in one go.
-        """
         self.payment_ids.action_post()
         # Perform the reconciliation of payments and source journal items
         for payment in self.payment_ids:
-            payment_move_line_id = payment.move_id.line_ids.filtered(
-                lambda x: x.account_id == payment.destination_account_id
-            )
-            apr = self.env["account.partial.reconcile"]
-            excl_pay_lines = self.env["account.payment.line"]
-            for line in payment.payment_line_ids:
-                if not line.move_line_id:
-                    continue
-                sign = -1 if payment.payment_order_id.payment_type == "outbound" else 1
-                if (
-                    float_compare(
-                        line.amount_currency,
-                        (line.move_line_id.amount_residual_currency * sign),
-                        precision_rounding=line.move_line_id.currency_id.rounding,
-                    )
-                    != 0
-                ):
-                    if line.move_line_id.amount_residual_currency < 0:
-                        debit_move_id = payment_move_line_id.id
-                        credit_move_id = line.move_line_id.id
-                    else:
-                        debit_move_id = line.move_line_id.id
-                        credit_move_id = payment_move_line_id.id
-                    apr.create(
-                        {
-                            "debit_move_id": debit_move_id,
-                            "credit_move_id": credit_move_id,
-                            "amount": abs(line.amount_company_currency),
-                            "debit_amount_currency": abs(line.amount_currency),
-                            "credit_amount_currency": abs(line.amount_currency),
-                        }
-                    )
-                    excl_pay_lines |= line
-            pay_lines = payment.payment_line_ids - excl_pay_lines
-            if pay_lines:
-                (pay_lines.move_line_id + payment_move_line_id).reconcile()
+            (
+                payment.payment_line_ids.move_line_id
+                + payment.move_id.line_ids.filtered(
+                    lambda x: x.account_id == payment.destination_account_id
+                )
+            ).reconcile()
         self.write(
             {"state": "uploaded", "date_uploaded": fields.Date.context_today(self)}
         )

@@ -33,11 +33,10 @@ class AccountPaymentLineCreate(models.TransientModel):
         string="Type of Date Filter",
         required=True,
     )
-    due_date = fields.Date(string="Due Date")
-    move_date = fields.Date(string="Move Date", default=fields.Date.context_today)
+    due_date = fields.Date()
+    move_date = fields.Date(default=fields.Date.context_today)
     payment_mode = fields.Selection(
         selection=[("same", "Same"), ("same_or_null", "Same or Empty"), ("any", "Any")],
-        string="Payment Mode",
     )
     move_line_ids = fields.Many2many(
         comodel_name="account.move.line", string="Move Lines"
@@ -120,12 +119,20 @@ class AccountPaymentLineCreate(models.TransientModel):
             # will not be refunded with a payment.
             domain += [
                 ("credit", ">", 0),
-                ("account_id.internal_type", "in", ["payable", "receivable"]),
+                (
+                    "account_id.account_type",
+                    "in",
+                    ["liability_payable", "asset_receivable"],
+                ),
             ]
         elif self.order_id.payment_type == "inbound":
             domain += [
                 ("debit", ">", 0),
-                ("account_id.internal_type", "in", ["receivable", "payable"]),
+                (
+                    "account_id.account_type",
+                    "in",
+                    ["asset_receivable", "liability_payable"],
+                ),
             ]
         # Exclude lines that are already in a non-cancelled
         # and non-uploaded payment order; lines that are in a

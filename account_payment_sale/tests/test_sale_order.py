@@ -10,8 +10,6 @@ class TestSaleOrder(CommonTestCase):
     def create_sale_order(self, payment_mode=None):
         with Form(self.env["sale.order"]) as sale_form:
             sale_form.partner_id = self.base_partner
-            sale_form.partner_invoice_id = self.base_partner
-            sale_form.partner_shipping_id = self.base_partner
             sale_form.pricelist_id = self.env.ref("product.list0")
             for (_, p) in self.products.items():
                 with sale_form.order_line.new() as order_line:
@@ -89,9 +87,10 @@ class TestSaleOrder(CommonTestCase):
                 "advance_payment_method": "fixed",
                 "fixed_amount": 5,
                 "product_id": self.env.ref("sale.advance_product_0").id,
+                "sale_order_ids": order,
             }
         )
-        payment.with_context(context).create_invoices()
+        payment.with_context(**context).create_invoices()
         invoice = order.invoice_ids
         self.assertEqual(len(invoice), 1)
         self.assertEqual(invoice.payment_mode_id, self.payment_mode_2)

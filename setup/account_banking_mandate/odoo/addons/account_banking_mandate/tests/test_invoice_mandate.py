@@ -1,25 +1,37 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017-2022 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+
+from unittest.mock import patch
 
 from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
+from odoo.addons.account.models.account_payment_method import AccountPaymentMethod
+
 
 class TestInvoiceMandate(TransactionCase):
     def test_post_invoice_01(self):
-        self.invoice._onchange_partner_id()
-        prev_orders = self.env["account.payment.order"].search([])
         self.assertEqual(self.invoice.mandate_id, self.mandate)
+
         self.invoice.action_post()
+
+        payable_move_lines = self.invoice.line_ids.filtered(
+            lambda s: s.account_id == self.invoice_account
+        )
+        if payable_move_lines:
+            self.assertEqual(payable_move_lines[0].move_id.mandate_id, self.mandate)
+
         self.env["account.invoice.payment.line.multi"].with_context(
             active_model="account.move", active_ids=self.invoice.ids
         ).create({}).run()
-        payment_order = self.env["account.payment.order"].search([]) - prev_orders
+
+        payment_order = self.env["account.payment.order"].search([])
         self.assertEqual(len(payment_order.ids), 1)
         payment_order.payment_mode_id_change()
         payment_order.draft2open()
+        payment_order.open2generated()
+        payment_order.generated2uploaded()
         self.assertEqual(self.mandate.payment_line_ids_count, 1)
 
     def test_post_invoice_02(self):
@@ -43,7 +55,6 @@ class TestInvoiceMandate(TransactionCase):
         )
         mandate_2.validate()
 
-        self.invoice._onchange_partner_id()
         self.assertEqual(self.invoice.mandate_id, self.mandate)
         self.invoice.action_post()
 
@@ -55,7 +66,6 @@ class TestInvoiceMandate(TransactionCase):
                 payable_move_lines[0].move_id.mandate_id = mandate_2
 
     def test_post_invoice_and_refund_02(self):
-        self.invoice._onchange_partner_id()
         self.invoice.action_post()
         self.assertEqual(self.invoice.mandate_id, self.mandate)
         move_reversal = (
@@ -66,6 +76,7 @@ class TestInvoiceMandate(TransactionCase):
                     "date": fields.Date.today(),
                     "reason": "no reason",
                     "refund_method": "refund",
+                    "journal_id": self.invoice.journal_id.id,
                 }
             )
         )
@@ -103,10 +114,19 @@ class TestInvoiceMandate(TransactionCase):
         )
 
         invoice.partner_id = partner_2
-        invoice._onchange_partner_id()
         self.assertEqual(invoice.mandate_id, mandate_2)
 
     def test_onchange_payment_mode(self):
+
+        Method_get_payment_method_information = (
+            AccountPaymentMethod._get_payment_method_information
+        )
+
+        def _get_payment_method_information(self):
+            res = Method_get_payment_method_information(self)
+            res["test"] = {"mode": "multi", "domain": [("type", "=", "bank")]}
+            return res
+
         invoice = self.env["account.move"].new(
             {
                 "partner_id": self.partner.id,
@@ -114,16 +134,20 @@ class TestInvoiceMandate(TransactionCase):
                 "company_id": self.company.id,
             }
         )
-        invoice._onchange_partner_id()
 
-        pay_method_test = self.env["account.payment.method"].create(
-            {
-                "name": "Test",
-                "code": "test",
-                "payment_type": "inbound",
-                "mandate_required": False,
-            }
-        )
+        with patch.object(
+            AccountPaymentMethod,
+            "_get_payment_method_information",
+            _get_payment_method_information,
+        ):
+            pay_method_test = self.env["account.payment.method"].create(
+                {
+                    "name": "Test",
+                    "code": "test",
+                    "payment_type": "inbound",
+                    "mandate_required": False,
+                }
+            )
         mode_inbound_acme_2 = self.env["account.payment.mode"].create(
             {
                 "name": "Inbound Credit ACME Bank 2",
@@ -134,7 +158,6 @@ class TestInvoiceMandate(TransactionCase):
         )
 
         invoice.payment_mode_id = mode_inbound_acme_2
-        invoice._onchange_payment_mode_id()
         self.assertEqual(invoice.mandate_id, self.env["account.banking.mandate"])
 
     def test_invoice_constrains(self):
@@ -232,11 +255,7 @@ class TestInvoiceMandate(TransactionCase):
 
         self.invoice_account = self.env["account.account"].search(
             [
-                (
-                    "user_type_id",
-                    "=",
-                    self.env.ref("account.data_account_type_receivable").id,
-                ),
+                ("account_type", "=", "asset_receivable"),
                 ("company_id", "=", self.company.id),
             ],
             limit=1,
@@ -245,11 +264,7 @@ class TestInvoiceMandate(TransactionCase):
             self.env["account.account"]
             .search(
                 [
-                    (
-                        "user_type_id",
-                        "=",
-                        self.env.ref("account.data_account_type_expenses").id,
-                    ),
+                    ("account_type", "=", "expense"),
                     ("company_id", "=", self.company.id),
                 ],
                 limit=1,

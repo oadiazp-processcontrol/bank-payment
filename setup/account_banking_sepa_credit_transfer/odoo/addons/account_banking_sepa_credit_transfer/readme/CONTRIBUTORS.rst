@@ -17,3 +17,8 @@
 * `Sygel Technology <https://www.sygel.es>`_:
 
   * Valentin Vinagre <valentin.vinagre@sygel.es>
+  * Manuel Regidor <manuel.regidor@sygel.es>
+
+* `Trobz <https://trobz.com>`_:
+
+  * Dung Tran <dungtd@trobz.com>

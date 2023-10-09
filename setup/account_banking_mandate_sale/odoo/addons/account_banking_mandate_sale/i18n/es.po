@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: bank-payment (10.0)\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-24 00:21+0000\n"
-"PO-Revision-Date: 2023-03-02 11:23+0000\n"
-"Last-Translator: brendapaniagua <brenda.paniagua@qubiq.es>\n"
+"PO-Revision-Date: 2023-09-02 18:08+0000\n"
+"Last-Translator: Ivorra78 <informatica@totmaterial.es>\n"
 "Language-Team: Spanish (http://www.transifex.com/oca/OCA-bank-payment-10-0/"
 "language/es/)\n"
 "Language: es\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1\n"
+"X-Generator: Weblate 4.17\n"
 
 #. module: account_banking_mandate_sale
 #: model:ir.model.fields,help:account_banking_mandate_sale.field_sale_order__mandate_required
@@ -28,12 +28,7 @@ msgid ""
 "direct debit mandate with your company."
 msgstr ""
 "Active esta opción si este método de pago requiere que su cliente firme un "
-"mandato de domiciliación con su empresa."
-
-#. module: account_banking_mandate_sale
-#: model:ir.model.fields,field_description:account_banking_mandate_sale.field_sale_order__commercial_partner_id
-msgid "Commercial Entity"
-msgstr "Entidad comercial"
+"mandato de domiciliación bancaria con su compañía."
 
 #. module: account_banking_mandate_sale
 #: model:ir.model.fields,field_description:account_banking_mandate_sale.field_sale_order__mandate_id
@@ -41,16 +36,28 @@ msgid "Direct Debit Mandate"
 msgstr "Mandato de adeudo directo"
 
 #. module: account_banking_mandate_sale
-#: model:ir.model.fields,field_description:account_banking_mandate_sale.field_sale_order__mandate_required
-msgid "Mandate Required"
-msgstr "Requiere Mandato"
+#: model:ir.model.fields,field_description:account_banking_mandate_sale.field_sale_order__commercial_invoice_partner_id
+msgid "Invoicing Commercial Entity"
+msgstr "Facturación de la entidad comercial"
 
 #. module: account_banking_mandate_sale
-#: model:ir.model,name:account_banking_mandate_sale.model_sale_order
-msgid "Sale Order"
-msgstr "Pedido de venta"
+#: model:ir.model.fields,field_description:account_banking_mandate_sale.field_sale_order__mandate_required
+msgid "Mandate Required"
+msgstr "Mandato requerido"
 
 #. module: account_banking_mandate_sale
 #: model:ir.model,name:account_banking_mandate_sale.model_sale_advance_payment_inv
 msgid "Sales Advance Payment Invoice"
 msgstr "Ventas. Anticipo pago factura"
+
+#. module: account_banking_mandate_sale
+#: model:ir.model,name:account_banking_mandate_sale.model_sale_order
+msgid "Sales Order"
+msgstr "Órdenes de venta"
+
+#~ msgid "Commercial Entity"
+#~ msgstr "Entidad comercial"
+
+#, fuzzy
+#~ msgid "Sale Order"
+#~ msgstr "Pedido de venta"

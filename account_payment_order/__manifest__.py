@@ -3,12 +3,13 @@
 # © 2013-2014 ACSONE SA (<https://acsone.eu>).
 # © 2016 Akretion (<https://www.akretion.com>).
 # © 2016 Aselcis (<https://www.aselcis.com>).
-# © 2014-2022 Tecnativa - Pedro M. Baeza
+# © 2014-2023 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
+
 
 {
     "name": "Account Payment Order",
-    "version": "14.0.2.2.0",
+    "version": "16.0.1.3.1",
     "license": "AGPL-3",
     "author": "ACSONE SA/NV, "
     "Therp BV, "
@@ -18,7 +19,6 @@
     "website": "https://github.com/OCA/bank-payment",
     "development_status": "Mature",
     "category": "Banking addons",
-    "external_dependencies": {"python": ["lxml"]},
     "depends": ["account_payment_partner", "base_iban"],  # for manual_bank_tranfer
     "data": [
         "views/account_payment_method.xml",
